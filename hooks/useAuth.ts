@@ -8,7 +8,7 @@ import {
 } from "firebase/auth";
 import { auth, isFirebaseConfigured } from "@/config/firebase";
 import { RootState, AppDispatch } from "@/store";
-import { setUser, setLoading, setError, logout } from "@/store/authSlice";
+import { setUser, setDemoUser, setLoading, setError, logout } from "@/store/authSlice";
 import { clearExpenses } from "@/store/expensesSlice";
 import { clearInsights } from "@/store/insightsSlice";
 
@@ -21,11 +21,6 @@ export function useAuth() {
   useEffect(() => {
     if (!isFirebaseConfigured || !auth) {
       dispatch(setUser(null));
-      dispatch(
-        setError(
-          "Firebase is not configured. Please add your Firebase credentials."
-        )
-      );
       return;
     }
 
@@ -111,6 +106,10 @@ export function useAuth() {
     }
   };
 
+  const continueAsGuest = () => {
+    dispatch(setDemoUser());
+  };
+
   return {
     user,
     isLoading,
@@ -120,5 +119,6 @@ export function useAuth() {
     signIn,
     signUp,
     logOut,
+    continueAsGuest,
   };
 }

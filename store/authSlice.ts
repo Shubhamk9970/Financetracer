@@ -29,6 +29,15 @@ const authSlice = createSlice({
       state.error = null;
       state.isInitialized = true;
     },
+    setDemoUser: (state) => {
+      state.user = {
+        uid: "demo-user",
+        email: "demo@moneycoach.app",
+      };
+      state.isLoading = false;
+      state.error = null;
+      state.isInitialized = true;
+    },
     setLoading: (state, action: PayloadAction<boolean>) => {
       state.isLoading = action.payload;
     },
@@ -47,7 +56,7 @@ const authSlice = createSlice({
   },
 });
 
-export const { setUser, setLoading, setError, clearError, logout } =
+export const { setUser, setDemoUser, setLoading, setError, clearError, logout } =
   authSlice.actions;
 
 export default authSlice.reducer;

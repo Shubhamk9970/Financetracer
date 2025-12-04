@@ -1,17 +1,12 @@
-import React, { useState } from "react";
+import React from "react";
 import {
   View,
-  TextInput,
   StyleSheet,
-  Pressable,
-  ActivityIndicator,
   Image,
   ScrollView,
   Platform,
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { useNavigation } from "@react-navigation/native";
-import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import {
   KeyboardAwareScrollView,
 } from "react-native-keyboard-controller";
@@ -21,32 +16,11 @@ import { Button } from "@/components/Button";
 import { useTheme } from "@/hooks/useTheme";
 import { useAuth } from "@/hooks/useAuth";
 import { Spacing, BorderRadius } from "@/constants/theme";
-import { RootStackParamList } from "@/navigation/RootNavigator";
 
 export default function SignInScreen() {
   const insets = useSafeAreaInsets();
-  const navigation =
-    useNavigation<NativeStackNavigationProp<RootStackParamList>>();
   const { theme } = useTheme();
-  const { signIn, isLoading, error, isFirebaseConfigured } = useAuth();
-
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [localError, setLocalError] = useState<string | null>(null);
-
-  const handleSignIn = async () => {
-    setLocalError(null);
-    if (!email.trim() || !password.trim()) {
-      setLocalError("Please enter email and password");
-      return;
-    }
-    try {
-      await signIn(email.trim(), password);
-    } catch {
-    }
-  };
-
-  const displayError = localError || error;
+  const { continueAsGuest } = useAuth();
 
   const content = (
     <View
@@ -76,112 +50,56 @@ export default function SignInScreen() {
       </View>
 
       <View style={styles.form}>
-        {!isFirebaseConfigured ? (
-          <View
-            style={[
-              styles.errorContainer,
-              { backgroundColor: `${theme.accent}15` },
-            ]}
-          >
-            <ThemedText style={[styles.configText, { color: theme.accent }]}>
-              Firebase not configured. Add your Firebase credentials to .env file to
-              enable authentication.
-            </ThemedText>
-          </View>
-        ) : null}
-
-        {displayError && isFirebaseConfigured ? (
-          <View
-            style={[
-              styles.errorContainer,
-              { backgroundColor: `${theme.error}15` },
-            ]}
-          >
-            <ThemedText style={[styles.errorText, { color: theme.error }]}>
-              {displayError}
-            </ThemedText>
-          </View>
-        ) : null}
-
-        <View style={styles.inputContainer}>
-          <ThemedText
-            type="small"
-            style={[styles.label, { color: theme.textSecondary }]}
-          >
-            Email
+        <View
+          style={[
+            styles.demoContainer,
+            { backgroundColor: `${theme.primary}10` },
+          ]}
+        >
+          <ThemedText style={[styles.demoTitle, { color: theme.primary }]}>
+            Demo Mode
           </ThemedText>
-          <TextInput
-            style={[
-              styles.input,
-              {
-                backgroundColor: theme.inputBackground,
-                borderColor: theme.border,
-                color: theme.text,
-              },
-            ]}
-            placeholder="Enter your email"
-            placeholderTextColor={theme.textSecondary}
-            value={email}
-            onChangeText={setEmail}
-            keyboardType="email-address"
-            autoCapitalize="none"
-            autoCorrect={false}
-            editable={!isLoading && isFirebaseConfigured}
-          />
-        </View>
-
-        <View style={styles.inputContainer}>
-          <ThemedText
-            type="small"
-            style={[styles.label, { color: theme.textSecondary }]}
-          >
-            Password
+          <ThemedText style={[styles.demoText, { color: theme.textSecondary }]}>
+            This is a demo app for hackathon submission. Tap below to explore all features with sample data.
           </ThemedText>
-          <TextInput
-            style={[
-              styles.input,
-              {
-                backgroundColor: theme.inputBackground,
-                borderColor: theme.border,
-                color: theme.text,
-              },
-            ]}
-            placeholder="Enter your password"
-            placeholderTextColor={theme.textSecondary}
-            value={password}
-            onChangeText={setPassword}
-            secureTextEntry
-            editable={!isLoading && isFirebaseConfigured}
-          />
         </View>
 
         <Button
-          onPress={handleSignIn}
-          disabled={isLoading || !isFirebaseConfigured}
+          onPress={continueAsGuest}
           style={[styles.button, { backgroundColor: theme.primary }]}
         >
-          {isLoading ? (
-            <ActivityIndicator color="#FFFFFF" size="small" />
-          ) : (
-            "Sign In"
-          )}
+          Continue as Guest
         </Button>
 
-        <Pressable
-          onPress={() => navigation.navigate("SignUp")}
-          disabled={isLoading}
-          style={({ pressed }) => [
-            styles.linkContainer,
-            { opacity: pressed ? 0.7 : 1 },
-          ]}
-        >
-          <ThemedText style={{ color: theme.textSecondary }}>
-            Don't have an account?{" "}
+        <View style={styles.featuresContainer}>
+          <ThemedText type="h4" style={styles.featuresTitle}>
+            Features
           </ThemedText>
-          <ThemedText style={{ color: theme.accent, fontWeight: "600" }}>
-            Sign Up
-          </ThemedText>
-        </Pressable>
+          <View style={styles.featureItem}>
+            <View style={[styles.featureDot, { backgroundColor: theme.primary }]} />
+            <ThemedText style={{ color: theme.textSecondary }}>
+              Track your daily expenses
+            </ThemedText>
+          </View>
+          <View style={styles.featureItem}>
+            <View style={[styles.featureDot, { backgroundColor: theme.primary }]} />
+            <ThemedText style={{ color: theme.textSecondary }}>
+              Categorize spending by type
+            </ThemedText>
+          </View>
+          <View style={styles.featureItem}>
+            <View style={[styles.featureDot, { backgroundColor: theme.primary }]} />
+            <ThemedText style={{ color: theme.textSecondary }}>
+              Get AI-powered financial insights
+            </ThemedText>
+          </View>
+          <View style={styles.featureItem}>
+            <View style={[styles.featureDot, { backgroundColor: theme.primary }]} />
+            <ThemedText style={{ color: theme.textSecondary }}>
+              View dashboard with spending summary
+            </ThemedText>
+          </View>
+        </View>
       </View>
     </View>
   );
@@ -229,11 +147,11 @@ const styles = StyleSheet.create({
   },
   logoContainer: {
     alignItems: "center",
-    marginBottom: Spacing["4xl"],
+    marginBottom: Spacing["3xl"],
   },
   logo: {
-    width: 80,
-    height: 80,
+    width: 100,
+    height: 100,
     marginBottom: Spacing.lg,
   },
   title: {
@@ -245,40 +163,40 @@ const styles = StyleSheet.create({
   form: {
     width: "100%",
   },
-  errorContainer: {
-    padding: Spacing.md,
-    borderRadius: BorderRadius.xs,
-    marginBottom: Spacing.lg,
+  demoContainer: {
+    padding: Spacing.lg,
+    borderRadius: BorderRadius.sm,
+    marginBottom: Spacing.xl,
+    alignItems: "center",
   },
-  errorText: {
-    fontSize: 14,
-    textAlign: "center",
-  },
-  configText: {
-    fontSize: 14,
-    textAlign: "center",
-  },
-  inputContainer: {
-    marginBottom: Spacing.lg,
-  },
-  label: {
+  demoTitle: {
+    fontSize: 18,
+    fontWeight: "700",
     marginBottom: Spacing.sm,
-    fontWeight: "500",
   },
-  input: {
-    height: Spacing.inputHeight,
-    borderWidth: 1,
-    borderRadius: BorderRadius.xs,
-    paddingHorizontal: Spacing.md,
-    fontSize: 16,
+  demoText: {
+    fontSize: 14,
+    textAlign: "center",
+    lineHeight: 20,
   },
   button: {
-    marginTop: Spacing.lg,
     borderRadius: BorderRadius.xs,
   },
-  linkContainer: {
+  featuresContainer: {
+    marginTop: Spacing["3xl"],
+  },
+  featuresTitle: {
+    marginBottom: Spacing.lg,
+  },
+  featureItem: {
     flexDirection: "row",
-    justifyContent: "center",
-    marginTop: Spacing["2xl"],
+    alignItems: "center",
+    marginBottom: Spacing.md,
+  },
+  featureDot: {
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+    marginRight: Spacing.md,
   },
 });

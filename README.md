@@ -1,13 +1,13 @@
 # MoneyCoach - AI-Powered Personal Finance App
 
-A minimal MVP personal finance tracking app with AI-powered insights, built with React Native and Firebase.
+A demo personal finance tracking app with AI-powered insights, built with React Native and Expo for hackathon submission.
 
 ## Features
 
-- **User Authentication**: Email/password sign up and sign in with Firebase Auth
+- **Demo Mode**: Start instantly with guest access - no sign up required
 - **Expense Tracking**: Add expenses with amount, category, and notes
-- **Real-time Sync**: Expenses saved to Firestore and synced across devices
-- **AI Insights**: Mock AI generates spending insights and tips based on your habits
+- **Dashboard**: View total spending and expense history
+- **AI Insights**: Smart financial tips based on your spending patterns
 - **Clean UI**: Simple, intuitive interface focused on quick expense entry
 
 ## Tech Stack
@@ -16,65 +16,6 @@ A minimal MVP personal finance tracking app with AI-powered insights, built with
 - Expo SDK 54
 - React Navigation 7
 - Redux Toolkit (State Management)
-- Firebase Auth (Authentication)
-- Firebase Firestore (Database)
-
-## Setup Instructions
-
-### 1. Clone and Install Dependencies
-
-```bash
-npm install
-```
-
-### 2. Firebase Configuration
-
-1. Go to [Firebase Console](https://console.firebase.google.com)
-2. Create a new project or select an existing one
-3. Add a Web app to get your configuration values
-4. Enable **Email/Password** authentication:
-   - Go to Authentication > Sign-in method
-   - Enable Email/Password provider
-5. Create a **Firestore Database**:
-   - Go to Firestore Database
-   - Create database in test mode (or set up security rules)
-
-### 3. Environment Variables
-
-Copy `.env.example` to `.env` and fill in your Firebase config:
-
-```bash
-cp .env.example .env
-```
-
-Edit `.env` with your Firebase values:
-
-```
-EXPO_PUBLIC_FIREBASE_API_KEY=your_api_key
-EXPO_PUBLIC_FIREBASE_AUTH_DOMAIN=your_project.firebaseapp.com
-EXPO_PUBLIC_FIREBASE_PROJECT_ID=your_project_id
-EXPO_PUBLIC_FIREBASE_STORAGE_BUCKET=your_project.appspot.com
-EXPO_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=your_sender_id
-EXPO_PUBLIC_FIREBASE_APP_ID=your_app_id
-```
-
-### 4. Firestore Security Rules (Recommended)
-
-For production, update your Firestore rules:
-
-```javascript
-rules_version = '2';
-service cloud.firestore {
-  match /databases/{database}/documents {
-    match /expenses/{expenseId} {
-      allow read, write: if request.auth != null 
-        && request.auth.uid == resource.data.userId;
-      allow create: if request.auth != null 
-        && request.auth.uid == request.resource.data.userId;
-    }
-  }
-}
-```
 
 ## Running the App
 
@@ -92,12 +33,119 @@ Scan the QR code with Expo Go app on your phone.
 npm run web
 ```
 
+---
+
+## Building Android APK
+
+### Option 1: Using EAS Build (Recommended)
+
+EAS (Expo Application Services) is the official way to build standalone apps.
+
+#### Step 1: Install EAS CLI
+
+```bash
+npm install -g eas-cli
+```
+
+#### Step 2: Login to Expo
+
+```bash
+eas login
+```
+
+Create a free account at https://expo.dev if you don't have one.
+
+#### Step 3: Configure EAS Build
+
+```bash
+eas build:configure
+```
+
+This creates an `eas.json` file. For APK (not AAB), update it:
+
+```json
+{
+  "build": {
+    "preview": {
+      "android": {
+        "buildType": "apk"
+      }
+    },
+    "production": {
+      "android": {
+        "buildType": "apk"
+      }
+    }
+  }
+}
+```
+
+#### Step 4: Build the APK
+
+```bash
+eas build -p android --profile preview
+```
+
+The build runs on Expo's servers. When complete, you'll get a download link for your APK.
+
+---
+
+### Option 2: Local Development Build
+
+If you want to build locally on your machine:
+
+#### Prerequisites
+
+1. Install Android Studio: https://developer.android.com/studio
+2. Set up Android SDK and accept licenses
+3. Add Android SDK to your PATH
+
+#### Steps
+
+```bash
+# Generate native Android project
+npx expo prebuild --platform android
+
+# Navigate to android folder
+cd android
+
+# Build debug APK
+./gradlew assembleDebug
+
+# OR build release APK
+./gradlew assembleRelease
+```
+
+The APK will be at:
+- Debug: `android/app/build/outputs/apk/debug/app-debug.apk`
+- Release: `android/app/build/outputs/apk/release/app-release.apk`
+
+---
+
+### Option 3: Expo Go (Testing Only)
+
+For testing on physical devices without building:
+
+1. Install "Expo Go" from Play Store
+2. Run `npm run dev`
+3. Scan the QR code with Expo Go
+
+Note: Expo Go is for development only, not for distribution.
+
+---
+
+## Quick Build Summary
+
+| Method | Time | Where it builds | Output |
+|--------|------|-----------------|--------|
+| EAS Build | ~15 min | Expo servers | Download link |
+| Local Build | ~5-10 min | Your machine | APK file |
+| Expo Go | Instant | N/A | Testing only |
+
 ## Project Structure
 
 ```
 ├── App.tsx                 # Root component with providers
-├── config/
-│   └── firebase.ts         # Firebase initialization
 ├── store/
 │   ├── index.ts            # Redux store configuration
 │   ├── authSlice.ts        # Authentication state
@@ -113,8 +161,7 @@ npm run web
 │   ├── RootNavigator.tsx   # Auth/Main navigation
 │   └── MainTabNavigator.tsx # Bottom tab navigation
 ├── screens/
-│   ├── SignInScreen.tsx    # Login screen
-│   ├── SignUpScreen.tsx    # Registration screen
+│   ├── SignInScreen.tsx    # Welcome/demo screen
 │   ├── HomeScreen.tsx      # Dashboard with expenses
 │   ├── AddExpenseScreen.tsx # Add expense form
 │   └── InsightsScreen.tsx  # AI insights list
@@ -133,36 +180,11 @@ npm run web
 - Bills & Utilities
 - Other
 
-## Mock AI Insights
-
-The app generates context-aware insights based on:
-- Category spending patterns
-- Weekly spending totals
-- General financial tips
-
-In a production app, replace `utils/mockAI.ts` with actual AI API calls.
-
-## Building for Production
-
-### Android APK
-
-For a standalone APK build, you'll need to:
-
-1. Install EAS CLI: `npm install -g eas-cli`
-2. Configure EAS: `eas build:configure`
-3. Build APK: `eas build -p android --profile preview`
-
-Or use the classic Expo build:
-```bash
-expo build:android -t apk
-```
-
 ## Notes
 
-- This is an MVP built for hackathon demo purposes
-- Mock AI is used instead of external API to avoid rate limits
-- For production, implement proper error handling and offline support
-- Consider adding expense editing/deletion functionality
+- This is a demo app - data is stored locally and resets on app restart
+- Mock AI is used for insights (no external API required)
+- Built for hackathon demonstration purposes
 
 ## License
 
